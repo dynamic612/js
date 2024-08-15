@@ -21,7 +21,7 @@ export { getPaymasterAndData } from "../../wallets/smart/lib/paymaster.js";
 export type {
   SmartWalletConnectionOptions,
   SmartWalletOptions,
-  UserOperation,
+  UserOperationV06 as UserOperation,
   PaymasterResult,
 } from "../../wallets/smart/types.js";
 
