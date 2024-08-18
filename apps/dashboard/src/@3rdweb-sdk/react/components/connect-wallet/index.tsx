@@ -2,13 +2,13 @@
 
 import { Spinner } from "@/components/ui/Spinner/Spinner";
 import { Button } from "@/components/ui/button";
-import { thirdwebClient } from "@/constants/client";
 import { useSupportedChains } from "@thirdweb-dev/react";
 import { useTrack } from "hooks/analytics/useTrack";
 import {
   useAddRecentlyUsedChainId,
   useRecentlyUsedChains,
 } from "hooks/chains/recentlyUsedChains";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";

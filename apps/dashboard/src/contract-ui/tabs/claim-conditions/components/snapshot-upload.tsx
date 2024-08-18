@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import {
   AspectRatio,
   Box,
@@ -26,6 +25,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Logo } from "components/logo";
+import { thirdwebClient } from "lib/thirdweb-client";
 import Papa from "papaparse";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DropzoneOptions, useDropzone } from "react-dropzone";

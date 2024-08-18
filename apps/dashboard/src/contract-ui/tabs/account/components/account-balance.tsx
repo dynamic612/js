@@ -1,6 +1,6 @@
-import { thirdwebClient } from "@/constants/client";
 import { useSplitBalances } from "@3rdweb-sdk/react/hooks/useSplit";
 import { SimpleGrid, Stat, StatLabel, StatNumber } from "@chakra-ui/react";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { getContract } from "thirdweb";
 import { useActiveWalletChain, useWalletBalance } from "thirdweb/react";

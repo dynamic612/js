@@ -1,7 +1,7 @@
-import { thirdwebClient } from "@/constants/client";
 import { Box, ButtonGroup, Flex } from "@chakra-ui/react";
 import { useContract } from "@thirdweb-dev/react";
 import { extensionDetectedState } from "components/buttons/ExtensionDetectButton";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { useMemo } from "react";
 import { getContract } from "thirdweb";

@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import {
   Accordion,
   AccordionButton,
@@ -24,6 +23,7 @@ import { FileInput } from "components/shared/FileInput";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useImageFileOrUrl } from "hooks/useImageFileOrUrl";
 import { useTxNotifications } from "hooks/useTxNotifications";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import type { NFT, ThirdwebContract } from "thirdweb";

@@ -1,5 +1,4 @@
 import { ToolTipLabel } from "@/components/ui/tooltip";
-import { thirdwebClient } from "@/constants/client";
 import { AdminOnly } from "@3rdweb-sdk/react/components/roles/admin-only";
 import { Box } from "@chakra-ui/react";
 import {
@@ -9,6 +8,7 @@ import {
 import { TransactionButton } from "components/buttons/TransactionButton";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useTxNotifications } from "hooks/useTxNotifications";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { CircleHelpIcon } from "lucide-react";
 import { getContract } from "thirdweb";

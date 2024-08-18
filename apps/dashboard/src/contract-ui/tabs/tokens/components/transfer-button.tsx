@@ -1,5 +1,5 @@
-import { thirdwebClient } from "@/constants/client";
 import { Icon, useDisclosure } from "@chakra-ui/react";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { useMemo } from "react";
 import { FiSend } from "react-icons/fi";

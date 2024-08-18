@@ -1,4 +1,4 @@
-import { thirdwebClient } from "@/constants/client";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { useMemo } from "react";
 import { getContract, toTokens } from "thirdweb";

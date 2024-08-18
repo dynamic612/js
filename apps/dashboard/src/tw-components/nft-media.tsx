@@ -1,5 +1,5 @@
-import { thirdwebClient } from "@/constants/client";
 import { cn } from "@/lib/utils";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { ImageIcon } from "lucide-react";
 import { MediaRenderer } from "thirdweb/react";
 

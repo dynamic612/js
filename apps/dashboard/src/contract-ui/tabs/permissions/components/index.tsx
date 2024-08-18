@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import { ButtonGroup, Flex } from "@chakra-ui/react";
 import {
   type ContractWithRoles,
@@ -11,6 +10,7 @@ import { TransactionButton } from "components/buttons/TransactionButton";
 import { BuiltinContractMap, ROLE_DESCRIPTION_MAP } from "constants/mappings";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useTxNotifications } from "hooks/useTxNotifications";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";

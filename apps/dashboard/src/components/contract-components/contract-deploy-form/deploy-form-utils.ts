@@ -1,4 +1,4 @@
-import { thirdwebClient } from "@/constants/client";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { upload } from "thirdweb/storage";
 
 // biome-ignore lint/suspicious/noExplicitAny: FIXME

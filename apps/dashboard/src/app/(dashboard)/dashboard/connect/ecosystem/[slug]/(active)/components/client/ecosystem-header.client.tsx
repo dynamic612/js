@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabLinks } from "@/components/ui/tabs";
-import { thirdwebClient } from "@/constants/client";
+import { thirdwebClient } from "lib/thirdweb-client";
 import {
   AlertTriangleIcon,
   CheckIcon,

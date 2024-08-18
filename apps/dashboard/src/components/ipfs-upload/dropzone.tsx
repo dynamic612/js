@@ -1,5 +1,4 @@
 import { Label } from "@/components/ui/label";
-import { thirdwebClient } from "@/constants/client";
 import { useDashboardStorageUpload } from "@3rdweb-sdk/react/hooks/useDashboardStorageUpload";
 import {
   AspectRatio,
@@ -22,6 +21,7 @@ import { PINNED_FILES_QUERY_KEY_ROOT } from "components/storage/your-files";
 import { useErrorHandler } from "contexts/error-handler";
 import { useTrack } from "hooks/analytics/useTrack";
 import { replaceIpfsUrl } from "lib/sdk";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { BsFillCloudUploadFill } from "react-icons/bs";

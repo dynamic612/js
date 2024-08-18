@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import { useLoggedInUser } from "@3rdweb-sdk/react/hooks/useLoggedInUser";
 import {
   type UseMutationOptions,
@@ -6,6 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { THIRDWEB_API_HOST } from "constants/urls";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { upload } from "thirdweb/storage";
 
 export type CreateEcosystemParams = {

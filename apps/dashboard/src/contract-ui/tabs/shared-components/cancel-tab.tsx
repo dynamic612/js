@@ -1,9 +1,9 @@
-import { thirdwebClient } from "@/constants/client";
 import { useEVMContractInfo } from "@3rdweb-sdk/react";
 import { Stack } from "@chakra-ui/react";
 import { TransactionButton } from "components/buttons/TransactionButton";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useTxNotifications } from "hooks/useTxNotifications";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { getContract } from "thirdweb";
 import { cancelAuction, cancelListing } from "thirdweb/extensions/marketplace";

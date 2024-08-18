@@ -1,7 +1,7 @@
 "use client";
 
 import { ColorModeToggle } from "@/components/color-mode-toggle";
-import { thirdwebClient } from "@/constants/client";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useTheme } from "next-themes";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";

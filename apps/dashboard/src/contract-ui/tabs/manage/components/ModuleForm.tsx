@@ -1,5 +1,4 @@
 import { Spinner } from "@/components/ui/Spinner/Spinner";
-import { thirdwebClient } from "@/constants/client";
 import { FormControl, Input, Select, Skeleton, Spacer } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { compatibleModules } from "@thirdweb-dev/sdk";
@@ -8,6 +7,7 @@ import {
   useAllVersions,
   usePublishedContractsQuery,
 } from "components/contract-components/hooks";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { FormProvider, type UseFormReturn, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {

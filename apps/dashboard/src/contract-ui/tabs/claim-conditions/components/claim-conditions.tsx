@@ -1,7 +1,7 @@
-import { thirdwebClient } from "@/constants/client";
 import { Flex, Stack } from "@chakra-ui/react";
 import type { DropContract } from "@thirdweb-dev/react";
 import { UpdateNotice } from "core-ui/update-notice/update-notice";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { getContract } from "thirdweb";
 import { Heading, Text } from "tw-components";

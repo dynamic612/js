@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import {
   useIsAdmin,
   useIsMinter,
@@ -17,6 +16,7 @@ import { detectFeatures } from "components/contract-components/utils";
 import { StepsCard } from "components/dashboard/StepsCard";
 import { useTabHref } from "contract-ui/utils";
 import { BigNumber } from "ethers";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { getContract } from "thirdweb";
 import { Link, Text } from "tw-components";

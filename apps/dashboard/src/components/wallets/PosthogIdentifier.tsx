@@ -1,4 +1,4 @@
-import { thirdwebClient } from "@/constants/client";
+import { thirdwebClient } from "lib/thirdweb-client";
 import posthog from "posthog-js-opensource";
 import { useEffect } from "react";
 import {

@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { thirdwebClient } from "@/constants/client";
 import { useTrack } from "hooks/analytics/useTrack";
 import { defineDashboardChain } from "lib/defineDashboardChain";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useTheme } from "next-themes";
 import { PayEmbed } from "thirdweb/react";
 import { getSDKTheme } from "../../../../../../components/sdk-component-theme";

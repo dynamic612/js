@@ -1,5 +1,5 @@
-import { thirdwebClient } from "@/constants/client";
 import { useMutation } from "@tanstack/react-query";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { upload } from "thirdweb/storage";
 
 type DashboardUploadOptions = {

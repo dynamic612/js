@@ -1,11 +1,9 @@
-import { DASHBOARD_THIRDWEB_SECRET_KEY } from "@/constants/env";
-import { DASHBOARD_THIRDWEB_CLIENT_ID } from "constants/rpc";
+import {
+  DASHBOARD_THIRDWEB_CLIENT_ID,
+  DASHBOARD_THIRDWEB_SECRET_KEY,
+  IPFS_GATEWAY_URL,
+} from "@/constants/env";
 import { createThirdwebClient } from "thirdweb";
-
-// use env var to set IPFS gateway or fallback to ipfscdn.io
-const IPFS_GATEWAY_URL =
-  (process.env.NEXT_PUBLIC_IPFS_GATEWAY_URL as string) ||
-  "https://{clientId}.ipfscdn.io/ipfs/{cid}/{path}";
 
 export const thirdwebClient = createThirdwebClient(
   DASHBOARD_THIRDWEB_SECRET_KEY

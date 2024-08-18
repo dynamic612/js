@@ -1,6 +1,6 @@
-import { thirdwebClient } from "@/constants/client";
 import { Center, Flex, Skeleton, useBreakpointValue } from "@chakra-ui/react";
 import { ChainIcon } from "components/icons/ChainIcon";
+import { thirdwebClient } from "lib/thirdweb-client";
 import Link from "next/link";
 import type { ChainMetadata } from "thirdweb/chains";
 import { MediaRenderer } from "thirdweb/react";

@@ -1,4 +1,3 @@
-import { thirdwebClient } from "@/constants/client";
 import { useSplitBalances } from "@3rdweb-sdk/react/hooks/useSplit";
 import {
   Center,
@@ -12,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useContract } from "@thirdweb-dev/react";
 import { useSupportedChainsRecord } from "hooks/chains/configureChains";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useMemo } from "react";
 import {
   type ThirdwebContract,

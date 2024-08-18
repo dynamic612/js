@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { thirdwebClient } from "@/constants/client";
 import { cn } from "@/lib/utils";
 import { useDashboardEVMChainId } from "@3rdweb-sdk/react";
 import { CustomConnectWallet } from "@3rdweb-sdk/react/components/connect-wallet";
@@ -36,6 +35,7 @@ import { getSDKTheme } from "app/components/sdk-component-theme";
 import { LOCAL_NODE_PKEY } from "constants/misc";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useSupportedChain } from "hooks/chains/configureChains";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { ExternalLinkIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";

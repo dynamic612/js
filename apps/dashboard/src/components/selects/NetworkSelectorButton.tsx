@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { thirdwebClient } from "@/constants/client";
 import { popularChains } from "@3rdweb-sdk/react/components/popularChains";
 import { useFavoriteChains } from "@3rdweb-sdk/react/hooks/useFavoriteChains";
 import { ChainIcon } from "components/icons/ChainIcon";
@@ -13,6 +12,7 @@ import {
   useRecentlyUsedChains,
 } from "hooks/chains/recentlyUsedChains";
 import { useSetIsNetworkConfigModalOpen } from "hooks/networkConfigModal";
+import { thirdwebClient } from "lib/thirdweb-client";
 import { useActiveChainAsDashboardChain } from "lib/v5-adapter";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef } from "react";
