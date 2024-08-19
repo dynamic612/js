@@ -13,11 +13,20 @@ import type { AbiFunction, SmartContract } from "@thirdweb-dev/sdk";
 import { TransactionButton } from "components/buttons/TransactionButton";
 import { SolidityInput } from "contract-ui/components/solidity-inputs";
 import { camelToTitle } from "contract-ui/components/solidity-inputs/helpers";
-import { BigNumber, type CallOverrides, utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { replaceIpfsUrl } from "lib/sdk";
+import { thirdwebClient } from "lib/thirdweb-client";
+import { useV5DashboardChain } from "lib/v5-adapter";
 import { useEffect, useId, useMemo } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { FiPlay } from "react-icons/fi";
+import {
+  type ThirdwebContract,
+  getContract,
+  readContract,
+  resolveMethod,
+} from "thirdweb";
+import { parseAbiParams, stringify } from "thirdweb/utils";
 import invariant from "tiny-invariant";
 import {
   Button,
@@ -36,6 +45,9 @@ function formatResponseData(data: unknown): string {
   // otherwise JSON.stringify(data) will wrap it in extra quotes - which will affect the value for [Copy button]
   if (typeof data === "string") {
     return data;
+  }
+  if (typeof data === "bigint") {
+    return data.toString();
   }
   if (BigNumber.isBigNumber(data)) {
     // biome-ignore lint/style/noParameterAssign: FIXME
@@ -56,7 +68,7 @@ function formatResponseData(data: unknown): string {
     }
   }
 
-  return JSON.stringify(data, null, 2);
+  return stringify(data, null, 2);
 }
 
 function formatError(error: Error): string {
@@ -119,16 +131,17 @@ interface InteractiveAbiFunctionProps {
   contract: SmartContract;
 }
 
-function useDelayedRead(
-  contract: Required<SmartContract> | undefined,
-  functionName?: string,
-) {
+function useAsyncRead(contract?: ThirdwebContract, functionName?: string) {
   return useMutation(
-    // biome-ignore lint/suspicious/noExplicitAny: FIXME
-    async ({ args, overrides }: { args: any[]; overrides?: CallOverrides }) => {
+    async ({ args, types }: { args: unknown[]; types: string[] }) => {
       invariant(contract, "Contract is required");
       invariant(functionName, "functionName is required");
-      return contract?.call(functionName, args, overrides);
+      const params = parseAbiParams(types, args);
+      return readContract({
+        contract,
+        method: resolveMethod(functionName),
+        params,
+      });
     },
   );
 }
@@ -137,6 +150,14 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
   abiFunction,
   contract,
 }) => {
+  const chain = useV5DashboardChain(contract.chainId);
+  const contractV5 = chain
+    ? getContract({
+        address: contract.getAddress(),
+        chain,
+        client: thirdwebClient,
+      })
+    : undefined;
   const formId = useId();
   const form = useForm({
     defaultValues: {
@@ -174,7 +195,7 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
     data: readData,
     isLoading: readLoading,
     error: readError,
-  } = useDelayedRead(contract, abiFunction?.name);
+  } = useAsyncRead(contractV5, abiFunction?.name);
 
   const error = isView ? readError : mutationError;
 
@@ -186,9 +207,12 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
       (abiFunction?.stateMutability === "view" ||
         abiFunction?.stateMutability === "pure")
     ) {
-      readFn({ args: [] });
+      readFn({
+        args: [],
+        types: [],
+      });
     }
-  }, [readFn, abiFunction?.stateMutability, form]);
+  }, [abiFunction, form, readFn]);
 
   return (
     <FormProvider {...form}>
@@ -220,9 +244,8 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
                 (abiFunction?.stateMutability === "view" ||
                   abiFunction?.stateMutability === "pure")
               ) {
-                readFn({
-                  args: formatted,
-                });
+                const types = abiFunction?.inputs.map((o) => o.type);
+                readFn({ args: formatted, types });
               } else {
                 mutate({
                   args: formatted,
@@ -319,7 +342,7 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
                 code={formatResponseData(data || readData)}
               />
               {typeof readData === "string" &&
-                readData?.startsWith("ipfs://") && (
+                (readData as string)?.startsWith("ipfs://") && (
                   <Text size="label.sm">
                     <TrackedLink
                       href={replaceIpfsUrl(readData)}
