@@ -26,7 +26,6 @@ import {
 } from "thirdweb";
 import { useSendAndConfirmTransaction } from "thirdweb/react";
 import { parseAbiParams, stringify } from "thirdweb/utils";
-import invariant from "tiny-invariant";
 import {
   Button,
   Card,
@@ -118,11 +117,9 @@ interface InteractiveAbiFunctionProps {
   contract: ThirdwebContract;
 }
 
-function useAsyncRead(contract?: ThirdwebContract, functionName?: string) {
+function useAsyncRead(contract: ThirdwebContract, functionName: string) {
   return useMutation(
     async ({ args, types }: { args: unknown[]; types: string[] }) => {
-      invariant(contract, "Contract is required");
-      invariant(functionName, "functionName is required");
       const params = parseAbiParams(types, args);
       return readContract({
         contract,
