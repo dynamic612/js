@@ -8,20 +8,17 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import type { AbiFunction, SmartContract } from "@thirdweb-dev/sdk";
+import type { AbiFunction } from "@thirdweb-dev/sdk";
 import { TransactionButton } from "components/buttons/TransactionButton";
 import { SolidityInput } from "contract-ui/components/solidity-inputs";
 import { camelToTitle } from "contract-ui/components/solidity-inputs/helpers";
 import { replaceIpfsUrl } from "lib/sdk";
-import { thirdwebClient } from "lib/thirdweb-client";
-import { useV5DashboardChain } from "lib/v5-adapter";
 import { useEffect, useId, useMemo } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { FiPlay } from "react-icons/fi";
 import { toast } from "sonner";
 import {
   type ThirdwebContract,
-  getContract,
   prepareContractCall,
   readContract,
   resolveMethod,
@@ -117,8 +114,8 @@ function formatContractCall(
 }
 
 interface InteractiveAbiFunctionProps {
-  abiFunction?: AbiFunction;
-  contract: SmartContract;
+  abiFunction: AbiFunction;
+  contract: ThirdwebContract;
 }
 
 function useAsyncRead(contract?: ThirdwebContract, functionName?: string) {
@@ -140,19 +137,11 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
   abiFunction,
   contract,
 }) => {
-  const chain = useV5DashboardChain(contract.chainId);
-  const contractV5 = chain
-    ? getContract({
-        address: contract.getAddress(),
-        chain,
-        client: thirdwebClient,
-      })
-    : undefined;
   const formId = useId();
   const form = useForm({
     defaultValues: {
       params:
-        abiFunction?.inputs.map((i) => ({
+        abiFunction.inputs.map((i) => ({
           key: i.name || "key",
           value: "",
           type: i.type,
@@ -185,7 +174,7 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
     data: readData,
     isLoading: readLoading,
     error: readError,
-  } = useAsyncRead(contractV5, abiFunction?.name);
+  } = useAsyncRead(contract, abiFunction.name);
 
   const error = isView ? readError : mutationError;
 
@@ -194,8 +183,8 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
   useEffect(() => {
     if (
       form.watch("params").length === 0 &&
-      (abiFunction?.stateMutability === "view" ||
-        abiFunction?.stateMutability === "pure")
+      (abiFunction.stateMutability === "view" ||
+        abiFunction.stateMutability === "pure")
     ) {
       readFn({
         args: [],
@@ -231,22 +220,19 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
               const formatted = formatContractCall(d.params);
               if (
                 contract &&
-                (abiFunction?.stateMutability === "view" ||
-                  abiFunction?.stateMutability === "pure")
+                (abiFunction.stateMutability === "view" ||
+                  abiFunction.stateMutability === "pure")
               ) {
-                const types = abiFunction?.inputs.map((o) => o.type);
+                const types = abiFunction.inputs.map((o) => o.type);
                 readFn({ args: formatted, types });
               } else {
-                if (!contractV5) {
-                  return toast.error("Cannot detect contract");
-                }
-                if (!abiFunction?.name) {
+                if (!abiFunction.name) {
                   return toast.error("Cannot detect function name");
                 }
                 const types = abiFunction.inputs.map((o) => o.type);
                 const params = parseAbiParams(types, formatted);
                 const transaction = prepareContractCall({
-                  contract: contractV5,
+                  contract,
                   method: resolveMethod(abiFunction.name),
                   params,
                   value: d.value ? toWei(d.value) : undefined,
@@ -280,7 +266,7 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
                       solidityType={item.type}
                       solidityComponents={item.components}
                       {...form.register(`params.${index}.value`)}
-                      functionName={abiFunction?.name}
+                      functionName={abiFunction.name}
                     />
                     <FormErrorMessage>
                       {
@@ -296,7 +282,7 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
             </>
           )}
 
-          {abiFunction?.stateMutability === "payable" && (
+          {abiFunction.stateMutability === "payable" && (
             <>
               <Divider mb="8px" />
               <FormControl gap={0.5}>
