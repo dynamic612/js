@@ -8,24 +8,26 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useContractWrite } from "@thirdweb-dev/react";
 import type { AbiFunction, SmartContract } from "@thirdweb-dev/sdk";
 import { TransactionButton } from "components/buttons/TransactionButton";
 import { SolidityInput } from "contract-ui/components/solidity-inputs";
 import { camelToTitle } from "contract-ui/components/solidity-inputs/helpers";
-import { BigNumber, utils } from "ethers";
 import { replaceIpfsUrl } from "lib/sdk";
 import { thirdwebClient } from "lib/thirdweb-client";
 import { useV5DashboardChain } from "lib/v5-adapter";
 import { useEffect, useId, useMemo } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { FiPlay } from "react-icons/fi";
+import { toast } from "sonner";
 import {
   type ThirdwebContract,
   getContract,
+  prepareContractCall,
   readContract,
   resolveMethod,
+  toWei,
 } from "thirdweb";
+import { useSendAndConfirmTransaction } from "thirdweb/react";
 import { parseAbiParams, stringify } from "thirdweb/utils";
 import invariant from "tiny-invariant";
 import {
@@ -48,10 +50,6 @@ function formatResponseData(data: unknown): string {
   }
   if (typeof data === "bigint") {
     return data.toString();
-  }
-  if (BigNumber.isBigNumber(data)) {
-    // biome-ignore lint/style/noParameterAssign: FIXME
-    data = data.toString();
   }
 
   if (typeof data === "object") {
@@ -99,7 +97,6 @@ function formatContractCall(
         }[]
       | undefined;
   }[],
-  value?: BigNumber,
 ) {
   const parsedParams = params
     .map((p) => (p.type === "bool" ? p.value !== "false" : p.value))
@@ -116,13 +113,6 @@ function formatContractCall(
         return p;
       }
     });
-
-  if (value) {
-    parsedParams.push({
-      value,
-    });
-  }
-
   return parsedParams;
 }
 
@@ -187,8 +177,8 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
     mutate,
     data,
     error: mutationError,
-    isLoading: mutationLoading,
-  } = useContractWrite(contract, abiFunction?.name);
+    isPending: mutationLoading,
+  } = useSendAndConfirmTransaction();
 
   const {
     mutate: readFn,
@@ -247,12 +237,21 @@ export const InteractiveAbiFunction: React.FC<InteractiveAbiFunctionProps> = ({
                 const types = abiFunction?.inputs.map((o) => o.type);
                 readFn({ args: formatted, types });
               } else {
-                mutate({
-                  args: formatted,
-                  overrides: d.value
-                    ? { value: utils.parseEther(d.value) }
-                    : undefined,
+                if (!contractV5) {
+                  return toast.error("Cannot detect contract");
+                }
+                if (!abiFunction?.name) {
+                  return toast.error("Cannot detect function name");
+                }
+                const types = abiFunction.inputs.map((o) => o.type);
+                const params = parseAbiParams(types, formatted);
+                const transaction = prepareContractCall({
+                  contract: contractV5,
+                  method: resolveMethod(abiFunction.name),
+                  params,
+                  value: d.value ? toWei(d.value) : undefined,
                 });
+                mutate(transaction);
               }
             }
           })}
