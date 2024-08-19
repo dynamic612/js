@@ -183,6 +183,8 @@ export const ConnectWalletSocialOptions = (
         authOption: strategy,
         client: props.client,
         ecosystem: ecosystemInfo,
+        redirectUrl: walletConfig?.auth?.redirectUrl,
+        redirectExternally: walletConfig?.auth?.redirectExternally,
       });
     }
 

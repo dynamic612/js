@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { thirdwebClient } from "@/constants/client";
 import { cn } from "@/lib/utils";
+import { useDashboardEVMChainId } from "@3rdweb-sdk/react";
 import { CustomConnectWallet } from "@3rdweb-sdk/react/components/connect-wallet";
 import {
   Box,
@@ -25,7 +26,6 @@ import {
 } from "@chakra-ui/react";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { useQuery } from "@tanstack/react-query";
-import { useSDK, useSDKChainId } from "@thirdweb-dev/react";
 import { FaucetButton } from "app/(dashboard)/(chain)/[chain_id]/(chainPage)/components/client/FaucetButton";
 import { GiftIcon } from "app/(dashboard)/(chain)/[chain_id]/(chainPage)/components/icons/GiftIcon";
 import type {
@@ -33,6 +33,7 @@ import type {
   ChainServices,
 } from "app/(dashboard)/(chain)/types/chain";
 import { getSDKTheme } from "app/components/sdk-component-theme";
+import { LOCAL_NODE_PKEY } from "constants/misc";
 import { useTrack } from "hooks/analytics/useTrack";
 import { useSupportedChain } from "hooks/chains/configureChains";
 import { ExternalLinkIcon } from "lucide-react";
@@ -41,6 +42,7 @@ import Link from "next/link";
 import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
 import { VscDebugDisconnect } from "react-icons/vsc";
 import { toast } from "sonner";
+import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { type Chain, type ChainMetadata, localhost } from "thirdweb/chains";
 import {
   PayEmbed,
@@ -51,6 +53,7 @@ import {
   useSwitchActiveWalletChain,
   useWalletBalance,
 } from "thirdweb/react";
+import { privateKeyToAccount } from "thirdweb/wallets";
 import { Button, type ButtonProps, Card, Heading, Text } from "tw-components";
 import { THIRDWEB_API_HOST } from "../../constants/urls";
 import { useV5DashboardChain } from "../../lib/v5-adapter";
@@ -62,7 +65,7 @@ const GAS_FREE_CHAINS = [
 
 function useNetworkMismatchAdapter() {
   const walletChainId = useActiveWalletChain()?.id;
-  const v4SDKChainId = useSDKChainId();
+  const v4SDKChainId = useDashboardEVMChainId();
   if (!walletChainId || !v4SDKChainId) {
     // simply not ready yet, assume false
     return false;
@@ -77,7 +80,6 @@ export const MismatchButton = forwardRef<HTMLButtonElement, ButtonProps>(
     const wallet = useActiveWallet();
     const activeWalletChain = useActiveWalletChain();
     const [dialog, setDialog] = useState<undefined | "no-funds" | "pay">();
-
     const { theme } = useTheme();
     const evmBalance = useWalletBalance({
       address: account?.address,
@@ -200,7 +202,14 @@ export const MismatchButton = forwardRef<HTMLButtonElement, ButtonProps>(
               {dialog === "no-funds" && (
                 <NoFundsDialogContent
                   chain={activeWalletChain}
-                  openPayModal={() => setDialog("pay")}
+                  openPayModal={() => {
+                    trackEvent({
+                      category: "pay",
+                      action: "buy",
+                      label: "attempt",
+                    });
+                    setDialog("pay");
+                  }}
                   onCloseModal={() => setDialog(undefined)}
                 />
               )}
@@ -211,6 +220,37 @@ export const MismatchButton = forwardRef<HTMLButtonElement, ButtonProps>(
                   theme={getSDKTheme(theme === "dark" ? "dark" : "light")}
                   className="!w-auto"
                   payOptions={{
+                    onPurchaseSuccess(info) {
+                      if (
+                        info.type === "crypto" &&
+                        info.status.status !== "NOT_FOUND"
+                      ) {
+                        trackEvent({
+                          category: "pay",
+                          action: "buy",
+                          label: "success",
+                          type: info.type,
+                          chainId: info.status.quote.toToken.chainId,
+                          tokenAddress: info.status.quote.toToken.tokenAddress,
+                          amount: info.status.quote.toAmount,
+                        });
+                      }
+
+                      if (
+                        info.type === "fiat" &&
+                        info.status.status !== "NOT_FOUND"
+                      ) {
+                        trackEvent({
+                          category: "pay",
+                          action: "buy",
+                          label: "success",
+                          type: info.type,
+                          chainId: info.status.quote.toToken.chainId,
+                          tokenAddress: info.status.quote.toToken.tokenAddress,
+                          amount: info.status.quote.estimatedToTokenAmount,
+                        });
+                      }
+                    },
                     prefillBuy: {
                       chain: activeWalletChain,
                     },
@@ -360,7 +400,7 @@ const MismatchNotice: React.FC<{
   onClose: (hasSwitched: boolean) => void;
 }> = ({ initialFocusRef, onClose }) => {
   const connectedChainId = useActiveWalletChain()?.id;
-  const desiredChainId = useSDKChainId();
+  const desiredChainId = useDashboardEVMChainId();
   const switchNetwork = useSwitchActiveWalletChain();
   const connectionStatus = useActiveWalletConnectionStatus();
   const activeWallet = useActiveWallet();
@@ -448,16 +488,30 @@ const MismatchNotice: React.FC<{
 };
 
 const GetLocalHostTestnetFunds: React.FC = () => {
-  const sdk = useSDK();
+  const address = useActiveAccount()?.address;
   const requestFunds = async () => {
-    if (sdk) {
-      try {
-        await sdk.wallet.requestFunds(10);
-        toast.success("Successfully got funds from localhost");
-      } catch (e) {
-        toast.error("Failed to get funds from localhost");
-      }
+    if (!address) {
+      return toast.error("No active account detected");
     }
+    const faucet = privateKeyToAccount({
+      privateKey: LOCAL_NODE_PKEY,
+      client: thirdwebClient,
+    });
+    const transaction = prepareTransaction({
+      to: address,
+      chain: localhost,
+      client: thirdwebClient,
+      value: toWei("10"),
+    });
+    const promise = sendTransaction({
+      account: faucet,
+      transaction,
+    });
+    toast.promise(promise, {
+      error: "Failed to get funds from localhost",
+      success: "Successfully got funds from localhost",
+      loading: "Requesting funds",
+    });
   };
 
   return (
