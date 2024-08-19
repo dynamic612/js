@@ -1,5 +1,11 @@
 # thirdweb
 
+## 5.47.2
+
+### Patch Changes
+
+- [#4172](https://github.com/thirdweb-dev/js/pull/4172) [`cb591aa`](https://github.com/thirdweb-dev/js/commit/cb591aa6afffa57de31e5bdce91ad9964856e81c) Thanks [@joaquim-verges](https://github.com/joaquim-verges)! - Only show pay modal if active wallet does not have enough funds for a paid transaction
+
 ## 5.47.1
 
 ### Patch Changes
